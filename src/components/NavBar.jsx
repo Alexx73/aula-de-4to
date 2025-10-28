@@ -58,14 +58,14 @@ export default function NavBar() {
             Dialog
           </Navbar.Link>
 
-          <Navbar.Link
+          {/* <Navbar.Link
             as={Link}
             to="/questions"
             active={isActive("/questions")}
             onClick={handleLinkClick}
           >
             Personal Info
-          </Navbar.Link>
+          </Navbar.Link> */}
 
           {/* <Navbar.Link
             as={Link}

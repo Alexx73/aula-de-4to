@@ -1,6 +1,7 @@
 import React, { useRef, useState, useEffect } from "react";
 import audioFile from "../assets/dialog1/2_hackers.mp3";
 import pdfHackers from "../assets/dialog1/hackers.pdf";
+import imgHackers from "../assets/dialog1/hackers.png";
 
 export default function Dialog1() {
   const audioRef = useRef(null);
@@ -13,8 +14,35 @@ export default function Dialog1() {
   const [isHovering, setIsHovering] = useState(false);
   const hideTimeout = useRef(null);
 
+  // 🧭 Control de zoom y arrastre
+const [zoom, setZoom] = useState(1);
+const [offset, setOffset] = useState({ x: 0, y: 0 });
+const [dragging, setDragging] = useState(false);
+const [lastPos, setLastPos] = useState({ x: 0, y: 0 });
+
+const startDrag = (e) => {
+  e.preventDefault();
+  setDragging(true);
+  const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+  const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+  setLastPos({ x: clientX, y: clientY });
+};
+
+const handleDrag = (e) => {
+  if (!dragging) return;
+  const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+  const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+  const dx = (clientX - lastPos.x) / zoom;
+  const dy = (clientY - lastPos.y) / zoom;
+  setOffset((prev) => ({ x: prev.x + dx, y: prev.y + dy }));
+  setLastPos({ x: clientX, y: clientY });
+};
+
+const endDrag = () => setDragging(false);
+
+
   // 🔧 Tiempo configurable en milisegundos
-  const tiempoControles = 4000; // 10 segundos
+  const tiempoControles = 1000; // 10 segundos
 
   // 🎧 Ocultamiento automático con detección de interacción
   const mostrarControlesTemporalmente = () => {
@@ -114,25 +142,60 @@ export default function Dialog1() {
       onClick={mostrarControlesTemporalmente}
       onTouchStart={mostrarControlesTemporalmente}
     >
-      {/* 📄 PDF a pantalla completa */}
-      <object
-        data={pdfHackers}
-        type="application/pdf"
-        className="w-full h-screen"
-        aria-label="PDF del diálogo Hackers"
-      >
-        <p className="text-center mt-10 text-gray-600">
-          Tu navegador no puede mostrar el PDF.
-          <a
-            href={pdfHackers}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-blue-500 underline ml-1"
-          >
-            Haz clic aquí para abrirlo
-          </a>
-        </p>
-      </object>
+    {/* 🖼️ Imagen con zoom y desplazamiento */}
+<div
+  className="relative flex justify-center items-center w-full h-screen bg-gray-100 overflow-hidden touch-pan-y select-none"
+>
+  <div
+    className="cursor-grab active:cursor-grabbing"
+    style={{
+      transform: `scale(${zoom}) translate(${offset.x}px, ${offset.y}px)`,
+      transition: dragging ? "none" : "transform 0.2s ease-out",
+    }}
+    onMouseDown={startDrag}
+    onMouseMove={handleDrag}
+    onMouseUp={endDrag}
+    onMouseLeave={endDrag}
+    onTouchStart={startDrag}
+    onTouchMove={handleDrag}
+    onTouchEnd={endDrag}
+  >
+    <img
+      src={imgHackers}
+      alt="Diálogo Hackers"
+      className="max-w-none h-auto shadow-lg rounded-md"
+      draggable={false}
+    />
+  </div>
+
+  {/* 🔍 Controles de zoom */}
+  <div className="absolute top-2 right-200 bg-white/70 backdrop-blur-md rounded-lg shadow-md p-2 flex  gap-2">
+    <button
+      onClick={() => setZoom((z) => Math.min(z + 0.2, 3))}
+      className="px-2 py-1 bg-purple-600 hover:bg-purple-700 text-white text-sm rounded"
+    >
+      ➕
+    </button>
+    <button
+      onClick={() => setZoom((z) => Math.max(z - 0.2, 0.8))}
+      className="px-2 py-1 bg-purple-600 hover:bg-purple-700 text-white text-sm rounded"
+    >
+      ➖
+    </button>
+    <button
+      onClick={() => {
+        setZoom(1);
+        setOffset({ x: 0, y: 0 });
+      }}
+      className="px-2 py-1 bg-green-500 hover:bg-green-600 text-white text-sm rounded"
+    >
+      🔄
+    </button>
+  </div>
+
+  
+</div>
+
 
       {/* 🎚 Panel lateral de controles */}
       <div
