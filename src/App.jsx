@@ -4,6 +4,7 @@ import './App.css';
 import Inicio from './pages/Inicio';
 import Personal from './pages/PersonalInformation';
 import PersonalQuestions from './pages/PersonalQuestions';
+import Dialog1 from './pages/Dialog1';
 
 
 import NavBar from './components/NavBar';
@@ -16,6 +17,10 @@ function App() {
         <Routes>
           <Route path="/" element={<Inicio />} />
           <Route path="/questions" element={<PersonalQuestions />} />
+          <Route path="/dialog1" element={<Dialog1 />} />
+
+
+          
        
         </Routes>
        </div>

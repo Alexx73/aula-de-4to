@@ -36,7 +36,7 @@ export default function NavBar() {
             alt="Logo"
           />
           <span className="text-lg md:text-xl font-semibold text-gray-900 dark:text-white ml-2">
-            Mi Aula de Inglés
+            Aula de Inglés de 4to Año
           </span>
         </Navbar.Brand>
 
@@ -49,14 +49,14 @@ export default function NavBar() {
             Inicio
           </Navbar.Link>
 
-          {/* <Navbar.Link
+          <Navbar.Link
             as={Link}
-            to="/alphabet"
-            active={isActive("/alphabet")}
+            to="/dialog1"
+            active={isActive("/dialog1")}
             onClick={handleLinkClick}
           >
-            Alphabet
-          </Navbar.Link> */}
+            Dialog
+          </Navbar.Link>
 
           <Navbar.Link
             as={Link}
