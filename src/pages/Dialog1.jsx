@@ -13,6 +13,7 @@ export default function Dialog1() {
   const [visible, setVisible] = useState(true);
   const [isHovering, setIsHovering] = useState(false);
   const hideTimeout = useRef(null);
+  
 
   // 🧭 Control de zoom y arrastre
 const [zoom, setZoom] = useState(1);
@@ -40,9 +41,33 @@ const handleDrag = (e) => {
 
 const endDrag = () => setDragging(false);
 
+const [showControls, setShowControls] = useState(true);
+
+useEffect(() => {
+  let timeoutId;
+
+  const mostrarControles = () => {
+    setShowControls(true);
+    clearTimeout(timeoutId);
+    timeoutId = setTimeout(() => setShowControls(false), tiempoControles);
+  };
+
+  // Escucha clics o toques para mostrar controles
+  window.addEventListener("click", mostrarControles);
+  window.addEventListener("touchstart", mostrarControles);
+
+  // Ocultar después de cierto tiempo
+  timeoutId = setTimeout(() => setShowControls(false), tiempoControles);
+
+  return () => {
+    window.removeEventListener("click", mostrarControles);
+    window.removeEventListener("touchstart", mostrarControles);
+    clearTimeout(timeoutId);
+  };
+}, []);
 
   // 🔧 Tiempo configurable en milisegundos
-  const tiempoControles = 1000; // 10 segundos
+  const tiempoControles = 2200; // 10 segundos
 
   // 🎧 Ocultamiento automático con detección de interacción
   const mostrarControlesTemporalmente = () => {
@@ -144,7 +169,7 @@ const endDrag = () => setDragging(false);
     >
     {/* 🖼️ Imagen con zoom y desplazamiento */}
 <div
-  className="relative flex justify-center items-center w-full h-screen bg-gray-100 overflow-hidden touch-pan-y select-none"
+  className="relative flex justify-center items-center w-full h-screen bg-gray-800 overflow-hidden touch-pan-y select-none"
 >
   <div
     className="cursor-grab active:cursor-grabbing"
@@ -163,22 +188,29 @@ const endDrag = () => setDragging(false);
     <img
       src={imgHackers}
       alt="Diálogo Hackers"
-      className="max-w-none h-auto shadow-lg rounded-md"
+      className="object-contain max-h-screen w-auto shadow-lg rounded-md"
       draggable={false}
     />
   </div>
 
-  {/* 🔍 Controles de zoom */}
-  <div className="absolute top-2 right-200 bg-white/70 backdrop-blur-md rounded-lg shadow-md p-2 flex  gap-2">
+ {/* 🔍 Controles de zoom centrados arriba con mismo efecto que la barra lateral */}
+<div
+  className={`fixed top-16 left-1/2 -translate-x-1/2 z-40 transition-opacity duration-1500 ${
+    visible ? "opacity-100" : "opacity-0 pointer-events-none"
+  }`}
+  onMouseEnter={() => setIsHovering(true)}
+  onMouseLeave={() => setIsHovering(false)}
+>
+  <div className="bg-white/70 backdrop-blur-md rounded-full shadow-md p-2 flex flex-row gap-3 items-center">
     <button
       onClick={() => setZoom((z) => Math.min(z + 0.2, 3))}
-      className="px-2 py-1 bg-purple-600 hover:bg-purple-700 text-white text-sm rounded"
+      className="px-3 py-1 bg-purple-600 hover:bg-purple-700 text-white text-sm rounded-full"
     >
       ➕
     </button>
     <button
       onClick={() => setZoom((z) => Math.max(z - 0.2, 0.8))}
-      className="px-2 py-1 bg-purple-600 hover:bg-purple-700 text-white text-sm rounded"
+      className="px-3 py-1 bg-purple-600 hover:bg-purple-700 text-white text-sm rounded-full"
     >
       ➖
     </button>
@@ -187,25 +219,33 @@ const endDrag = () => setDragging(false);
         setZoom(1);
         setOffset({ x: 0, y: 0 });
       }}
-      className="px-2 py-1 bg-green-500 hover:bg-green-600 text-white text-sm rounded"
+      className="px-3 py-1 bg-green-500 hover:bg-green-600 text-white text-sm rounded-full"
     >
       🔄
     </button>
   </div>
+</div>
+
 
   
 </div>
 
 
       {/* 🎚 Panel lateral de controles */}
-      <div
-        className={`fixed top-1/2 left-0 transform -translate-y-1/2 transition-opacity duration-3000 z-50 ${
-          visible ? "opacity-100" : "opacity-0 pointer-events-none"
-        }`}
-        onMouseEnter={() => setIsHovering(true)}
-        onMouseLeave={() => setIsHovering(false)}
-      >
-        <div className="flex flex-col gap-4 bg-purple-100/80 backdrop-blur-md p-4 pl-5 rounded-r-2xl shadow-2xl border border-purple-200">
+     <div
+  className={`fixed top-1/2 left-0 transform -translate-y-1/2 transition-opacity duration-500 z-50 ${
+    visible ? "opacity-100" : "opacity-0 pointer-events-none"
+  }`}
+  onMouseEnter={() => setIsHovering(true)}
+  onMouseLeave={() => setIsHovering(false)}
+>
+  <div
+    className="flex flex-col gap-3 bg-purple-100/80 backdrop-blur-md 
+      p-3 pl-4 sm:p-4 sm:pl-5 
+      rounded-r-2xl shadow-2xl border border-purple-200 
+      w-[70px] sm:w-[100px]"
+  >
+
           <audio
             ref={audioRef}
             src={audioFile}
